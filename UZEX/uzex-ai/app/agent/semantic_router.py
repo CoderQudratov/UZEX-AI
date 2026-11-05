@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 from pydantic import ValidationError
 
 from app.agent.answer_formatter import format_answer
+from app.agent.entity_resolver import normalize
 from app.agent.gemini_client import PlannerFailure
 from app.agent.language_detector import conservative_normalize, detect_language, outside_names
 from app.agent.prompt_builder import PromptBuilder
@@ -325,6 +326,11 @@ class SemanticRouter:
             return output("AMBIGUOUS", "IDENTIFIER_CONTEXT")
         canonical = conservative_normalize(question)
         intent = signals(question)
+        rank_text = normalize(outside_names(canonical))
+        if intent.metric == "unknown" and re.search(
+            r"eng kop|eng katta|bolshe vsego|naibol|top\s*[0-9]*", rank_text
+        ):
+            return output("AMBIGUOUS", "METRIC_AMBIGUOUS")
         stripped = canonical.strip(" ?.").casefold()
         if stripped in ("kerak", "керак"):
             return output("AMBIGUOUS", "MISSING_TASK")

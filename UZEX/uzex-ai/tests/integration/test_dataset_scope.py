@@ -83,3 +83,20 @@ async def test_numeric_input_asks_for_meaning_instead_of_rejecting_language(scop
     assert "Faqat o‘zbekcha" not in result.answer
     assert result.plan is None and result.verified_result is None
     assert planner.calls == 0
+
+
+@pytest.mark.parametrize(
+    "question",
+    [
+        "2024 yildagi eng kop sotilgan buyum",
+        "2025 да энг кўп цемент олган фирма",
+        "Какая компания купила больше всего цемента?",
+    ],
+)
+@pytest.mark.anyio
+async def test_unspecified_ranking_metric_needs_no_provider(scope_engine, question):
+    planner = NeverPlanner()
+    result = await SemanticRouter(scope_engine, planner).answer(question)
+    assert result.status == "AMBIGUOUS"
+    assert result.reason == "METRIC_AMBIGUOUS"
+    assert result.verified_result is None and planner.calls == 0

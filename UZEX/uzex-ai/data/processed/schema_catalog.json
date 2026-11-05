@@ -1,0 +1,839 @@
+{
+  "schema_version": 1,
+  "dataset_version": "sha256:88182bf4dad3569eea5fac611e8a16db7a455110fdaa6495650e7d87e09ac258",
+  "source_sha256": "88182bf4dad3569eea5fac611e8a16db7a455110fdaa6495650e7d87e09ac258",
+  "logical_sha256": "e9f17cd418b009797b90b3962ae1464156b4eef31421fd07d1ee8ea3c01c8eb5",
+  "synthetic_source": true,
+  "source_files": {
+    "participants.csv": {
+      "rows": 14392,
+      "sha256": "c7f7234b2830c1e1e2d6e7e2f564dee483229dad480d0f5abde60a8d82fa5e97",
+      "uncompressed_bytes": 1788200
+    },
+    "brokers.csv": {
+      "rows": 120,
+      "sha256": "eeca01d53319f66376f6f8acee4a5061749276e1833c41f51e01298d7800f7d9",
+      "uncompressed_bytes": 7403
+    },
+    "usd_rates.csv": {
+      "rows": 1765,
+      "sha256": "1517a35854552c17e3bcbdf4eb9c8872463c1228032ec4f7fd4643acb51b4e3c",
+      "uncompressed_bytes": 35089
+    },
+    "contracts.csv": {
+      "rows": 6616,
+      "sha256": "1a194df8bf054116badf952d67c33e011044ce1e9ff754ab2288866251cbba64",
+      "uncompressed_bytes": 3431599
+    },
+    "deals_2022.csv": {
+      "rows": 84299,
+      "sha256": "2bbb6653e17ff725960af5c18bd8f7f431faf73d32ae794e0376399f25d895d7",
+      "uncompressed_bytes": 25742129
+    },
+    "deals_2023.csv": {
+      "rows": 93985,
+      "sha256": "7b774317431b159f6f30208f878257794f8c8f2a0b58bae5226ba9da68b32b78",
+      "uncompressed_bytes": 28887441
+    },
+    "deals_2024.csv": {
+      "rows": 106647,
+      "sha256": "88a8415440eb7b9228824dd5f99028262c2defcbf53f121a870a8bd17d3b28b6",
+      "uncompressed_bytes": 32669593
+    },
+    "deals_2025.csv": {
+      "rows": 115763,
+      "sha256": "8dfa30e9c5b5b14ff59a5e4060c98661b18821d334b53b5e6f04b42b7ced5013",
+      "uncompressed_bytes": 35528621
+    },
+    "deals_2026.csv": {
+      "rows": 99306,
+      "sha256": "cc983823e1ecf721f79deb30c05fff14283231fe71bccc590cda61cc503520de",
+      "uncompressed_bytes": 29968687
+    }
+  },
+  "duckdb_version": "1.5.6",
+  "tables": {
+    "participants": {
+      "primary_key": "inn",
+      "expected_rows": 14392,
+      "columns": [
+        {
+          "source": "ИНН",
+          "name": "inn",
+          "sql_type": "VARCHAR",
+          "kind": "inn",
+          "nullable": false
+        },
+        {
+          "source": "Наименование",
+          "name": "name",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Регион",
+          "name": "region",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Вид деятельности",
+          "name": "activity",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Роль",
+          "name": "role",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Плательщик НДС",
+          "name": "vat_payer",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        }
+      ]
+    },
+    "brokers": {
+      "primary_key": "broker_code",
+      "expected_rows": 120,
+      "columns": [
+        {
+          "source": "Код брокера",
+          "name": "broker_code",
+          "sql_type": "VARCHAR",
+          "kind": "broker",
+          "nullable": false
+        },
+        {
+          "source": "Наименование",
+          "name": "name",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "ИНН",
+          "name": "inn",
+          "sql_type": "VARCHAR",
+          "kind": "inn",
+          "nullable": false
+        },
+        {
+          "source": "Регион",
+          "name": "region",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        }
+      ]
+    },
+    "usd_rates": {
+      "primary_key": "rate_date",
+      "expected_rows": 1765,
+      "columns": [
+        {
+          "source": "Дата",
+          "name": "rate_date",
+          "sql_type": "DATE",
+          "kind": "date",
+          "nullable": false
+        },
+        {
+          "source": "Курс",
+          "name": "usd_uzs_rate",
+          "sql_type": "DECIMAL(12,2)",
+          "kind": "money",
+          "nullable": false
+        }
+      ]
+    },
+    "contracts": {
+      "primary_key": "contract_id",
+      "expected_rows": 6616,
+      "columns": [
+        {
+          "source": "Номер контракта",
+          "name": "contract_id",
+          "sql_type": "BIGINT",
+          "kind": "id",
+          "nullable": false
+        },
+        {
+          "source": "Наименование продукта",
+          "name": "product_name",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Марка товара",
+          "name": "brand",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": true
+        },
+        {
+          "source": "Размер товара",
+          "name": "size",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": true
+        },
+        {
+          "source": "Сорт товара",
+          "name": "grade",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": true
+        },
+        {
+          "source": "Тип товара",
+          "name": "product_type",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": true
+        },
+        {
+          "source": "Класс товара",
+          "name": "product_class",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": true
+        },
+        {
+          "source": "Код ТН ВЭД",
+          "name": "tn_ved_code",
+          "sql_type": "VARCHAR",
+          "kind": "code",
+          "nullable": false
+        },
+        {
+          "source": "Группа товара",
+          "name": "product_group",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Категория товара",
+          "name": "product_category",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Отрасль промышленности",
+          "name": "industry",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Единица измерения",
+          "name": "unit",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Лот",
+          "name": "lot_size",
+          "sql_type": "BIGINT",
+          "kind": "integer",
+          "nullable": false
+        },
+        {
+          "source": "Валюта",
+          "name": "currency",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Базисная цена",
+          "name": "base_price",
+          "sql_type": "DECIMAL(18,2)",
+          "kind": "money",
+          "nullable": false
+        },
+        {
+          "source": "Сумма залога",
+          "name": "deposit_percent",
+          "sql_type": "DECIMAL(5,2)",
+          "kind": "percent",
+          "nullable": false
+        },
+        {
+          "source": "Базис поставки",
+          "name": "delivery_basis",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Регион",
+          "name": "region",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Адрес склада",
+          "name": "warehouse_address",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Тип торгов",
+          "name": "auction_type",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Тип контракта",
+          "name": "contract_type",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Форма контракта",
+          "name": "contract_form",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Срок оплаты",
+          "name": "payment_days",
+          "sql_type": "INTEGER",
+          "kind": "integer",
+          "nullable": false
+        },
+        {
+          "source": "Срок поставки",
+          "name": "delivery_days",
+          "sql_type": "INTEGER",
+          "kind": "integer",
+          "nullable": false
+        },
+        {
+          "source": "Упаковка",
+          "name": "packaging",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "ИНН продавца",
+          "name": "seller_inn",
+          "sql_type": "VARCHAR",
+          "kind": "inn",
+          "nullable": false
+        },
+        {
+          "source": "Дата регистрации",
+          "name": "registered_date",
+          "sql_type": "DATE",
+          "kind": "date",
+          "nullable": false
+        },
+        {
+          "source": "Действует до",
+          "name": "valid_until",
+          "sql_type": "DATE",
+          "kind": "date",
+          "nullable": false
+        }
+      ]
+    },
+    "deals": {
+      "primary_key": "deal_id",
+      "expected_rows": 500000,
+      "columns": [
+        {
+          "source": "Номер сделки",
+          "name": "deal_id",
+          "sql_type": "BIGINT",
+          "kind": "id",
+          "nullable": false
+        },
+        {
+          "source": "Дата сделки",
+          "name": "deal_date",
+          "sql_type": "DATE",
+          "kind": "date",
+          "nullable": false
+        },
+        {
+          "source": "Время сделки",
+          "name": "deal_time",
+          "sql_type": "TIME",
+          "kind": "time",
+          "nullable": false
+        },
+        {
+          "source": "Тип торгов",
+          "name": "auction_type",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Количество",
+          "name": "quantity",
+          "sql_type": "BIGINT",
+          "kind": "integer",
+          "nullable": false
+        },
+        {
+          "source": "Сумма сделки",
+          "name": "amount",
+          "sql_type": "DECIMAL(18,2)",
+          "kind": "money",
+          "nullable": false
+        },
+        {
+          "source": "Стартовая цена",
+          "name": "starting_price",
+          "sql_type": "DECIMAL(18,2)",
+          "kind": "money",
+          "nullable": false
+        },
+        {
+          "source": "Номер контракта",
+          "name": "contract_id",
+          "sql_type": "BIGINT",
+          "kind": "id",
+          "nullable": false
+        },
+        {
+          "source": "Наименование товара",
+          "name": "product_description",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Лот",
+          "name": "lot_size",
+          "sql_type": "BIGINT",
+          "kind": "integer",
+          "nullable": false
+        },
+        {
+          "source": "Единица измерения",
+          "name": "unit",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Регион",
+          "name": "region",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Тип контракта",
+          "name": "contract_type",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Форма контракта",
+          "name": "contract_form",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "Состояние сделки",
+          "name": "status",
+          "sql_type": "VARCHAR",
+          "kind": "text",
+          "nullable": false
+        },
+        {
+          "source": "ИНН продавца",
+          "name": "seller_inn",
+          "sql_type": "VARCHAR",
+          "kind": "inn",
+          "nullable": false
+        },
+        {
+          "source": "ИНН покупателя",
+          "name": "buyer_inn",
+          "sql_type": "VARCHAR",
+          "kind": "inn",
+          "nullable": false
+        },
+        {
+          "source": "Брокер продавца",
+          "name": "seller_broker_code",
+          "sql_type": "VARCHAR",
+          "kind": "broker",
+          "nullable": false
+        },
+        {
+          "source": "Брокер покупателя",
+          "name": "buyer_broker_code",
+          "sql_type": "VARCHAR",
+          "kind": "broker",
+          "nullable": false
+        },
+        {
+          "source": "Дата оплаты",
+          "name": "payment_date",
+          "sql_type": "DATE",
+          "kind": "date",
+          "nullable": true
+        },
+        {
+          "source": "Дата поставки",
+          "name": "delivery_date",
+          "sql_type": "DATE",
+          "kind": "date",
+          "nullable": true
+        },
+        {
+          "source": "Поставлено",
+          "name": "delivered_lots",
+          "sql_type": "BIGINT",
+          "kind": "integer",
+          "nullable": true
+        }
+      ]
+    }
+  },
+  "allowed_joins": [
+    {
+      "child": "deals",
+      "foreign_key": "contract_id",
+      "parent": "contracts",
+      "parent_key": "contract_id",
+      "cardinality": "many-to-one"
+    },
+    {
+      "child": "deals",
+      "foreign_key": "seller_inn",
+      "parent": "participants",
+      "parent_key": "inn",
+      "cardinality": "many-to-one"
+    },
+    {
+      "child": "deals",
+      "foreign_key": "buyer_inn",
+      "parent": "participants",
+      "parent_key": "inn",
+      "cardinality": "many-to-one"
+    },
+    {
+      "child": "deals",
+      "foreign_key": "seller_broker_code",
+      "parent": "brokers",
+      "parent_key": "broker_code",
+      "cardinality": "many-to-one"
+    },
+    {
+      "child": "deals",
+      "foreign_key": "buyer_broker_code",
+      "parent": "brokers",
+      "parent_key": "broker_code",
+      "cardinality": "many-to-one"
+    },
+    {
+      "child": "deals",
+      "foreign_key": "deal_date",
+      "parent": "usd_rates",
+      "parent_key": "rate_date",
+      "cardinality": "many-to-one"
+    },
+    {
+      "child": "contracts",
+      "foreign_key": "seller_inn",
+      "parent": "participants",
+      "parent_key": "inn",
+      "cardinality": "many-to-one"
+    }
+  ],
+  "statuses": {
+    "Новый": "Concluded on snapshot day 2026-10-30",
+    "Не подписан": "Not yet signed by the parties",
+    "Заключен": "Forward/futures signed; payment deadline not expired",
+    "Ждёт оплату": "Spot signed; payment deadline not expired",
+    "Оплачен": "Paid, not yet delivered",
+    "Исполнен": "Paid and delivered in full",
+    "Исполнен(Частично)": "Paid and partly delivered; delivered_lots is evidence",
+    "Аннулирован(Не оплачен)": "Unpaid by deadline and cancelled; trade not fulfilled"
+  },
+  "units": [
+    "килограмм",
+    "тонна",
+    "литр",
+    "метр",
+    "кв.метр",
+    "куб.метр",
+    "штука"
+  ],
+  "semantics": {
+    "currency": "amount/base_price/starting_price are in contract currency; never sum UZS+USD",
+    "currency_values": {
+      "Узбекский сум": "UZS",
+      "Доллар США": "USD"
+    },
+    "amount_uzs": "USD amount * usd_uzs_rate on deal_date; UZS amount unchanged; DECIMAL(30,4)",
+    "volume": "quantity * lot_size, HUGEINT, in recorded unit; do not mix units",
+    "delivered_volume": "delivered_lots * lot_size; NULL means absent evidence, not zero",
+    "unit_price_exact": "unit_price_numerator / NULLIF(unit_price_denominator,0)",
+    "unit_price_rounded_8": "DECIMAL(38,8), positive ROUND_HALF_UP with exact integer arithmetic",
+    "dates": "source DD.MM.YYYY; stored DATE; times Asia/Tashkent, no timezone conversion",
+    "snapshot": "2026-10-30 end of day; rate coverage 2022-01-01 through 2026-10-31",
+    "status_filter": "No implicit exclusion: cancelled and partial transactions remain present",
+    "empty_values": "Only declared nullable source fields become NULL; no silent coercion",
+    "deposit_percent": "Source '10 %' becomes DECIMAL 10.00, percentage points, not money",
+    "regions": "Original Russian/Uzbek values preserved; fixed verified aliases used for validation"
+  },
+  "view": {
+    "name": "deals_enriched",
+    "rows": 500000,
+    "columns": [
+      {
+        "name": "deal_id",
+        "sql_type": "BIGINT"
+      },
+      {
+        "name": "deal_date",
+        "sql_type": "DATE"
+      },
+      {
+        "name": "deal_time",
+        "sql_type": "TIME"
+      },
+      {
+        "name": "auction_type",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "quantity",
+        "sql_type": "BIGINT"
+      },
+      {
+        "name": "amount",
+        "sql_type": "DECIMAL(18,2)"
+      },
+      {
+        "name": "starting_price",
+        "sql_type": "DECIMAL(18,2)"
+      },
+      {
+        "name": "contract_id",
+        "sql_type": "BIGINT"
+      },
+      {
+        "name": "product_description",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "lot_size",
+        "sql_type": "BIGINT"
+      },
+      {
+        "name": "unit",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "region",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "contract_type",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "contract_form",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "status",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "seller_inn",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "buyer_inn",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "seller_broker_code",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "buyer_broker_code",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "payment_date",
+        "sql_type": "DATE"
+      },
+      {
+        "name": "delivery_date",
+        "sql_type": "DATE"
+      },
+      {
+        "name": "delivered_lots",
+        "sql_type": "BIGINT"
+      },
+      {
+        "name": "currency",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "product_name",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "brand",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "size",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "grade",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "product_type",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "product_class",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "tn_ved_code",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "product_group",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "product_category",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "industry",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "contract_region",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "warehouse_address",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "delivery_basis",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "packaging",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "base_price",
+        "sql_type": "DECIMAL(18,2)"
+      },
+      {
+        "name": "deposit_percent",
+        "sql_type": "DECIMAL(5,2)"
+      },
+      {
+        "name": "payment_days",
+        "sql_type": "INTEGER"
+      },
+      {
+        "name": "delivery_days",
+        "sql_type": "INTEGER"
+      },
+      {
+        "name": "registered_date",
+        "sql_type": "DATE"
+      },
+      {
+        "name": "valid_until",
+        "sql_type": "DATE"
+      },
+      {
+        "name": "seller_name",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "seller_region",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "buyer_name",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "buyer_region",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "seller_broker_name",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "buyer_broker_name",
+        "sql_type": "VARCHAR"
+      },
+      {
+        "name": "usd_uzs_rate",
+        "sql_type": "DECIMAL(12,2)"
+      },
+      {
+        "name": "volume",
+        "sql_type": "HUGEINT"
+      },
+      {
+        "name": "delivered_volume",
+        "sql_type": "HUGEINT"
+      },
+      {
+        "name": "amount_uzs",
+        "sql_type": "DECIMAL(30,4)"
+      },
+      {
+        "name": "unit_price_numerator",
+        "sql_type": "DECIMAL(18,2)"
+      },
+      {
+        "name": "unit_price_denominator",
+        "sql_type": "HUGEINT"
+      },
+      {
+        "name": "unit_price_rounded_8",
+        "sql_type": "DECIMAL(38,8)"
+      }
+    ]
+  }
+}

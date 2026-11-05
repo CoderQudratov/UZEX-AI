@@ -6,11 +6,11 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://uzex-ai-hackathon.onrender.com/api/:path*"
+      "destination": "https://uzex-ai-hackathon-gl0o.onrender.com/api/:path*"
     },
     {
       "source": "/health",
-      "destination": "https://uzex-ai-hackathon.onrender.com/health"
+      "destination": "https://uzex-ai-hackathon-gl0o.onrender.com/health"
     },
     {
       "source": "/",

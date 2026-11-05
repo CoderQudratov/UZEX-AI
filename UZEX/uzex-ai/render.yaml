@@ -2,6 +2,7 @@ services:
   - type: web
     name: uzex-ai
     runtime: docker
+    rootDir: UZEX/uzex-ai
     plan: free
     region: frankfurt
     healthCheckPath: /health
@@ -12,11 +13,11 @@ services:
       - key: DATABASE_PATH
         value: data/processed/uzex.duckdb
       - key: GEMINI_MODEL
-        value: gemini-3.8-flash
+        value: gemini-3.6-flash
       - key: GEMINI_API_KEY
         sync: false
       - key: MAX_CONCURRENT_QUERIES
-        value: "4"
+        value: "2"
       - key: GEMINI_TIMEOUT_SECONDS
         value: "20"
 

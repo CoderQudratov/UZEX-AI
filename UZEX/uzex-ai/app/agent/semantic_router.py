@@ -17,6 +17,7 @@ from app.agent.prompt_builder import PromptBuilder
 from app.agent.query_models import Lookup, QueryPlan
 from app.agent.semantic_guard import GuardRejected, check_decision, signals
 from app.agent.semantic_models import LANGUAGE_MAP, SemanticDecision, SemanticResult
+from app.core.diagnostics import correlation_id, diagnostic
 
 
 @dataclass
@@ -32,6 +33,20 @@ class SemanticMetrics:
 
 
 CLARIFY = {
+    "ENTITY_AMBIGUOUS": (
+        (
+            "Qaysi kompaniya yoki mahsulotni nazarda tutyapsiz? Aniq nomi yoki STIRni "
+            "kiriting; sotuvchi yoki xaridor ekanini belgilang."
+        ),
+        (
+            "Қайси компания ёки маҳсулотни назарда тутяпсиз? Аниқ номи ёки СТИРни "
+            "киритинг; сотувчи ёки харидор эканини белгиланг."
+        ),
+        (
+            "Уточните компанию или продукт: укажите точное название или ИНН, а также роль "
+            "продавца или покупателя."
+        ),
+    ),
     "METRIC_AMBIGUOUS": (
         "Miqdormi, summami yoki bitimlar sonimi?",
         "Миқдорми, суммами ёки битимлар соними?",
@@ -68,6 +83,60 @@ CLARIFY = {
         "Уточните, какие данные нужны.",
     ),
 }
+INFRASTRUCTURE = {
+    "GEMINI_QUOTA_EXHAUSTED": (
+        (
+            "AI xizmati so‘rovlar limitiga yetdi. Hozir javobni bazadan tekshira olmadim. "
+            "Birozdan so‘ng qayta urinib ko‘ring."
+        ),
+        (
+            "AI хизмати сўровлар лимитига етди. Ҳозир жавобни базадан текшира олмадим. "
+            "Бироздан сўнг қайта уриниб кўринг."
+        ),
+        (
+            "Достигнут лимит AI-сервиса. Сейчас не удалось проверить ответ по базе. "
+            "Повторите попытку позже."
+        ),
+    ),
+    "GEMINI_UNAVAILABLE": (
+        "AI xizmati vaqtincha mavjud emas. Javobni bazadan tekshira olmadim. Qayta urinib ko‘ring.",
+        "AI хизмати вақтинча мавжуд эмас. Жавобни базадан текшира олмадим. Қайта уриниб кўринг.",
+        "AI-сервис временно недоступен. Не удалось проверить ответ по базе. Повторите попытку.",
+    ),
+    "GEMINI_TIMEOUT": (
+        (
+            "AI xizmati belgilangan vaqtda javob bermadi. Tasdiqlanmagan ma’lumot bera "
+            "olmayman. Qayta urinib ko‘ring."
+        ),
+        (
+            "AI хизмати белгиланган вақтда жавоб бермади. Тасдиқланмаган маълумот бера "
+            "олмайман. Қайта уриниб кўринг."
+        ),
+        (
+            "AI-сервис не ответил вовремя. Не могу сообщить неподтверждённые данные. "
+            "Повторите попытку."
+        ),
+    ),
+    "MODEL_JSON_INVALID": (
+        (
+            "AI so‘rovni to‘g‘ri shakllantira olmadi. Tasdiqlanmagan javob bera olmayman. "
+            "Savolni aniqroq yozing yoki qayta urinib ko‘ring."
+        ),
+        (
+            "AI сўровни тўғри шакллантира олмади. Тасдиқланмаган жавоб бера олмайман. "
+            "Саволни аниқроқ ёзинг ёки қайта уриниб кўринг."
+        ),
+        (
+            "AI-сервис не сформировал корректный запрос. Не могу дать неподтверждённый "
+            "ответ. Уточните вопрос или повторите попытку."
+        ),
+    ),
+    "GEMINI_CONFIGURATION": (
+        "AI xizmati sozlamalari sababli so‘rov bajarilmadi. Javobni bazadan tekshira olmadim.",
+        "AI хизмати созламалари сабабли сўров бажарилмади. Жавобни базадан текшира олмадим.",
+        "Запрос не выполнен из-за настроек AI-сервиса. Не удалось проверить ответ по базе.",
+    ),
+}
 GENERIC = {
     "AMBIGUOUS": ("So‘rovni aniqlashtiring.", "Сўровни аниқлаштиринг.", "Уточните запрос."),
     "UNSUPPORTED": (
@@ -90,6 +159,17 @@ def notice(language, status, reason):
             "Пожалуйста, используйте узбекский или русский язык."
         )
     index = {"uz_latn": 0, "uz_cyrl": 1, "ru": 2}.get(language, 0)
+    reason = {
+        "MODEL_TIMEOUT": "GEMINI_TIMEOUT",
+        "MODEL_UNAVAILABLE": "GEMINI_UNAVAILABLE",
+        "MODEL_TRANSPORT_ERROR": "GEMINI_UNAVAILABLE",
+        "GEMINI_TRANSPORT": "GEMINI_UNAVAILABLE",
+        "GEMINI_AUTHENTICATION": "GEMINI_CONFIGURATION",
+        "GEMINI_MODEL_NOT_FOUND": "GEMINI_CONFIGURATION",
+        "GEMINI_NOT_CONFIGURED": "GEMINI_CONFIGURATION",
+    }.get(reason, reason)
+    if reason in INFRASTRUCTURE:
+        return GENERIC["ERROR"][index] + " " + INFRASTRUCTURE[reason][index]
     return CLARIFY.get(reason, GENERIC.get(status, GENERIC["AMBIGUOUS"]))[index]
 
 
@@ -142,8 +222,11 @@ class SemanticRouter:
         self.metrics = SemanticMetrics()
         self._slots = asyncio.Semaphore(max_concurrency)
 
-    async def understand(self, question):
+    async def understand(self, question, *, request_id=None):
         start = time.perf_counter()
+        request_id = request_id or correlation_id()
+        stage = "language_detector"
+        stage_start = start
         self.metrics.requests += 1
         language = "unsupported"
         calls = 0
@@ -166,6 +249,7 @@ class SemanticRouter:
         if not isinstance(question, str) or not question.strip() or len(question.encode()) > 4096:
             return output("UNSUPPORTED", "REQUEST_SIZE")
         hint = detect_language(question)
+        diagnostic(stage, None, "SUCCESS", stage_start, request_id)
         language = hint.language or "unsupported"
         if hint.disposition == "unsupported":
             self.metrics.language_rejections += 1
@@ -203,21 +287,30 @@ class SemanticRouter:
                 await self._slots.acquire()
             acquired = True
             reference = self.reference_date or datetime.now(ZoneInfo("Asia/Tashkent")).date()
+            stage, stage_start = "prompt_builder", time.perf_counter()
             system, contents, context = await asyncio.to_thread(
                 self.prompts.build, question, hint, reference
             )
+            diagnostic(stage, None, "SUCCESS", stage_start, request_id)
+            stage, stage_start = "gemini_client", time.perf_counter()
             raw, calls, model_ms = await self.planner.generate(system, contents)
+            diagnostic(stage, None, "SUCCESS", stage_start, request_id)
             self.metrics.model_calls += calls
             self.metrics.model_responses += 1
             self.metrics.model_ms.append(model_ms)
+            stage, stage_start = "json_validation", time.perf_counter()
             try:
                 decision = SemanticDecision.model_validate_json(raw)
-            except (ValidationError, ValueError, TypeError):
+            except (ValidationError, ValueError, TypeError) as exc:
+                diagnostic(stage, type(exc).__name__, "MODEL_JSON_INVALID", stage_start, request_id)
                 self.metrics.json_validation_failures += 1
                 return output("ERROR", "MODEL_JSON_INVALID")
+            diagnostic(stage, None, "SUCCESS", stage_start, request_id)
             if not hint.language or decision.language == "unsupported":
                 language = decision.language
+            stage, stage_start = "semantic_guard", time.perf_counter()
             plan = check_decision(question, hint, decision, context, self.engine, reference)
+            diagnostic(stage, None, "SUCCESS", stage_start, request_id)
             if decision.status == "UNSUPPORTED":
                 if decision.language == "unsupported":
                     self.metrics.language_rejections += 1
@@ -228,16 +321,21 @@ class SemanticRouter:
                 return output("ERROR", "MODEL_CONTRACT")
             return output("VERIFIED", "NONE", plan)
         except GuardRejected as exc:
+            diagnostic(stage, type(exc).__name__, exc.reason, stage_start, request_id)
             self.metrics.guard_rejections += 1
             return output(exc.status, exc.reason)
         except PlannerFailure as exc:
+            diagnostic(stage, exc.exception_class, exc.category, stage_start, request_id)
             calls = exc.calls
             model_ms = exc.latency_ms
             self.metrics.model_calls += calls
-            return output("ERROR", exc.reason)
-        except TimeoutError:
+            result = output("ERROR", exc.reason)
+            return result.model_copy(update={"answer": notice(language, "ERROR", exc.category)})
+        except TimeoutError as exc:
+            diagnostic(stage, type(exc).__name__, "SEMANTIC_CAPACITY", stage_start, request_id)
             return output("ERROR", "SEMANTIC_CAPACITY")
-        except Exception:
+        except Exception as exc:
+            diagnostic(stage, type(exc).__name__, "SEMANTIC_INTERNAL", stage_start, request_id)
             return output("ERROR", "SEMANTIC_INTERNAL")
         finally:
             if acquired:
@@ -245,17 +343,35 @@ class SemanticRouter:
 
     async def answer(self, question):
         start = time.perf_counter()
-        semantic = await self.understand(question)
+        request_id = correlation_id()
+        semantic = await self.understand(question, request_id=request_id)
         if semantic.status != "VERIFIED":
             return semantic
-        verified = await asyncio.to_thread(self.engine.execute, semantic.plan)
-        internal_language = LANGUAGE_MAP[semantic.language]
+        stage, stage_start = "query_execution", time.perf_counter()
+        try:
+            verified = await asyncio.to_thread(self.engine.execute, semantic.plan)
+            diagnostic(stage, None, verified.reason or verified.status, stage_start, request_id)
+            stage, stage_start = "answer_formatter", time.perf_counter()
+            internal_language = LANGUAGE_MAP[semantic.language]
+            answer = format_answer(verified, internal_language)
+            diagnostic(stage, None, "SUCCESS", stage_start, request_id)
+        except Exception as exc:
+            diagnostic(stage, type(exc).__name__, "INTERNAL_FAILURE", stage_start, request_id)
+            return semantic.model_copy(
+                update={
+                    "status": "ERROR",
+                    "reason": "INTERNAL_FAILURE",
+                    "plan": None,
+                    "answer": notice(semantic.language, "ERROR", "INTERNAL_FAILURE"),
+                    "end_to_end_ms": (time.perf_counter() - start) * 1000,
+                }
+            )
         return semantic.model_copy(
             update={
                 "status": verified.status,
                 "reason": verified.reason,
                 "verified_result": verified,
-                "answer": format_answer(verified, internal_language),
+                "answer": answer,
                 "end_to_end_ms": (time.perf_counter() - start) * 1000,
             }
         )

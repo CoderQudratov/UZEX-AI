@@ -19,6 +19,7 @@ from starlette.exceptions import HTTPException
 from app.agent.gemini_client import GeminiPlanner
 from app.agent.query_executor import QueryExecutor
 from app.agent.semantic_router import SemanticRouter
+from app.api.body_limit import BodyLimit
 from app.core.config import Settings, load_settings
 from app.core.errors import ErrorCode, ErrorDetail, ErrorEnvelope
 from app.services.chat_models import ChatRequest, ChatResponse
@@ -88,17 +89,29 @@ def create_app(
     async def lifespan(application: FastAPI):
         loaded_settings = settings if settings is not None else load_settings()
         application.state.settings = loaded_settings
-        application.state.ready = True
+        application.state.ready = False
 
         if getattr(application.state, "chat_service", None) is None:
             _init_components(application, loaded_settings, router, chat_service)
 
+        application.state.ready = (
+            getattr(application.state, "engine", None) is not None
+            and getattr(application.state, "chat_service", None) is not None
+        )
         logger.info("startup")
         try:
             yield
         finally:
             logger.info("shutdown")
             application.state.ready = False
+            service = getattr(application.state, "chat_service", None)
+            planner = getattr(getattr(service, "router", None), "planner", None)
+            if planner is not None and callable(getattr(planner, "aclose", None)):
+                await planner.aclose()
+            engine = getattr(application.state, "engine", None)
+            warehouse = getattr(engine, "warehouse", None)
+            if warehouse is not None and callable(getattr(warehouse, "close", None)):
+                warehouse.close()
             if hasattr(application.state, "chat_service"):
                 del application.state.chat_service
             if hasattr(application.state, "engine"):
@@ -116,12 +129,15 @@ def create_app(
     )
 
     # Initial state setup
-    application.state.ready = True
+    application.state.ready = False
     application.state.engine = None
     application.state.chat_service = None
     if settings is not None:
         application.state.settings = settings
         _init_components(application, settings, router, chat_service)
+        application.state.ready = (
+            application.state.engine is not None and application.state.chat_service is not None
+        )
 
     application.add_middleware(
         CORSMiddleware,
@@ -130,6 +146,8 @@ def create_app(
         allow_methods=["GET", "POST", "OPTIONS"],
         allow_headers=["Content-Type", "Accept"],
     )
+
+    application.add_middleware(BodyLimit, maximum=MAX_BODY_BYTES)
 
     @application.middleware("http")
     async def request_size_guard(request: Request, call_next):

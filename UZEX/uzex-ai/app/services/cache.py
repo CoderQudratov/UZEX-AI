@@ -25,6 +25,8 @@ class ChatCache:
         return hashlib.sha256(payload).hexdigest()
 
     async def get(self, message: str) -> ChatResponse | None:
+        if self._maxsize <= 0:
+            return None
         key = self.hash_key(message)
         async with self._lock:
             if key in self._cache:
@@ -33,6 +35,8 @@ class ChatCache:
             return None
 
     async def set(self, message: str, response: ChatResponse) -> None:
+        if self._maxsize <= 0:
+            return
         if response.status not in ("VERIFIED", "NOT_FOUND"):
             return
         key = self.hash_key(message)

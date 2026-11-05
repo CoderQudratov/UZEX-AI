@@ -37,7 +37,7 @@ class ChatService:
         router: SemanticRouter,
         *,
         max_concurrency: int = 4,
-        cache_size: int = 256,
+        cache_size: int = 0,
         dataset_version: str | None = None,
     ) -> None:
         self.router = router

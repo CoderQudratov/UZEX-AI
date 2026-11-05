@@ -11,15 +11,32 @@ from app.agent.wire_schema import response_schema
 
 # Explicitly reviewed profile. No fallback, 'latest' alias, tools or model auto-routing.
 MODEL_PROFILES = {
+    "gemini-3.6-flash": types.ThinkingConfig(thinking_level="LOW"),
     "gemini-3.8-flash": types.ThinkingConfig(thinking_level="LOW"),
     "gemini-3.5-flash-lite": types.ThinkingConfig(thinking_level="LOW"),
 }
 
 
 class PlannerFailure(RuntimeError):
-    def __init__(self, reason, calls=0, latency_ms=None):
+    def __init__(self, reason, calls=0, latency_ms=None, *, category=None, exception_class=None):
         self.reason, self.calls, self.latency_ms = reason, calls, latency_ms
+        self.category = category or reason
+        self.exception_class = exception_class or type(self).__name__
         super().__init__(reason)
+
+
+def api_category(code):
+    return {
+        400: "GEMINI_INVALID_REQUEST",
+        401: "GEMINI_AUTHENTICATION",
+        403: "GEMINI_AUTHENTICATION",
+        404: "GEMINI_MODEL_NOT_FOUND",
+        429: "GEMINI_QUOTA_EXHAUSTED",
+        500: "GEMINI_UNAVAILABLE",
+        502: "GEMINI_UNAVAILABLE",
+        503: "GEMINI_UNAVAILABLE",
+        504: "GEMINI_TIMEOUT",
+    }.get(code, "GEMINI_API_ERROR")
 
 
 class GeminiPlanner:
@@ -62,8 +79,23 @@ class GeminiPlanner:
                     raise PlannerFailure("MODEL_UNSUPPORTED")
             except PlannerFailure:
                 raise
-            except Exception:
-                raise PlannerFailure("MODEL_UNAVAILABLE") from None
+            except errors.APIError as exc:
+                self.api_error_counts[exc.code] += 1
+                raise PlannerFailure(
+                    "MODEL_UNAVAILABLE",
+                    category=api_category(exc.code),
+                    exception_class=type(exc).__name__,
+                ) from None
+            except TimeoutError:
+                raise PlannerFailure(
+                    "MODEL_TIMEOUT", category="GEMINI_TIMEOUT", exception_class="TimeoutError"
+                ) from None
+            except Exception as exc:
+                raise PlannerFailure(
+                    "MODEL_UNAVAILABLE",
+                    category="GEMINI_TRANSPORT",
+                    exception_class=type(exc).__name__,
+                ) from None
             self._ready = True
 
     async def generate(self, system_instruction, contents):
@@ -115,15 +147,31 @@ class GeminiPlanner:
                         if attempt == 0 and exc.code in (429, 500, 502, 503, 504):
                             await asyncio.sleep(1.0)
                             continue
-                        raise PlannerFailure("MODEL_API_ERROR", calls) from None
+                        raise PlannerFailure(
+                            "MODEL_API_ERROR",
+                            calls,
+                            (time.perf_counter() - start) * 1000,
+                            category=api_category(exc.code),
+                            exception_class=type(exc).__name__,
+                        ) from None
         except TimeoutError:
             raise PlannerFailure(
-                "MODEL_TIMEOUT", calls, (time.perf_counter() - start) * 1000
+                "MODEL_TIMEOUT",
+                calls,
+                (time.perf_counter() - start) * 1000,
+                category="GEMINI_TIMEOUT",
+                exception_class="TimeoutError",
             ) from None
         except PlannerFailure:
             raise
-        except Exception:
-            raise PlannerFailure("MODEL_TRANSPORT_ERROR", calls) from None
+        except Exception as exc:
+            raise PlannerFailure(
+                "MODEL_TRANSPORT_ERROR",
+                calls,
+                (time.perf_counter() - start) * 1000,
+                category="GEMINI_TRANSPORT",
+                exception_class=type(exc).__name__,
+            ) from None
         finally:
             self._slots.release()
 

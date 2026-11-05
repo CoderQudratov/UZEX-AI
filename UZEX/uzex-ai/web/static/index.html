@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UZEX AI — Spot Savdolari Analitik Asistenti</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <div class="brand-logo" aria-hidden="true">U</div>
+      <div class="brand-info">
+        <h1>
+          <span data-i18n="title">UZEX AI</span>
+          <span class="brand-badge" data-i18n="badge">Spot Analitika</span>
+        </h1>
+        <p data-i18n="subtitle">500 000 ta birja bitimi bo‘yicha tasdiqlangan ma’lumotlar</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <!-- Status Badge -->
+      <div id="status-badge" class="status-badge" title="Tizim holati">
+        <span class="status-indicator"></span>
+        <span id="status-text" class="status-text" data-i18n="status_loading">Ulanmoqda...</span>
+      </div>
+
+      <!-- Language Selector -->
+      <div class="lang-selector" role="group" aria-label="Til tanlash">
+        <button type="button" class="lang-btn active" data-lang="uz_latn">UZ</button>
+        <button type="button" class="lang-btn" data-lang="uz_cyrl">ЎЗ</button>
+        <button type="button" class="lang-btn" data-lang="ru">RU</button>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" class="icon-btn" type="button" title="Mavzuni almashtirish" aria-label="Mavzuni almashtirish">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Chat Container -->
+  <main class="chat-container">
+    <!-- Disclaimer Banner -->
+    <div class="disclaimer-banner" role="note">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"></circle>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+      </svg>
+      <span data-i18n="disclaimer">Javoblar faqat tasdiqlangan UZEX spot bitimlari datasetiga asoslanadi. Chat tarixi saqlanmaydi.</span>
+    </div>
+
+    <!-- Messages Feed -->
+    <div id="messages-feed" class="messages-feed" role="log" aria-live="polite">
+      <!-- Welcome Hero Card -->
+      <section id="welcome-card" class="welcome-card">
+        <h2 data-i18n="welcome_title">UZEX AI birja tahlil tizimiga xush kelibsiz</h2>
+        <p data-i18n="welcome_desc">Savdo bitimlari, shartnomalar, sotuvchi/xaridor kompaniyalar va tovarlar bo‘yicha rasmiy ma’lumotlarni oling.</p>
+
+        <div class="examples-section">
+          <h3 data-i18n="examples_title">Namuna savollar:</h3>
+          <div id="examples-grid" class="examples-grid">
+            <!-- Chips rendered dynamically via app.js -->
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Typing Indicator -->
+    <div id="typing-indicator" class="typing-indicator" style="display: none; margin: 0 1.25rem 0.75rem 1.25rem;">
+      <div class="dots-wrapper">
+        <span class="dot"></span>
+        <span class="dot"></span>
+        <span class="dot"></span>
+      </div>
+      <span data-i18n="loading">Hisoblanmoqda...</span>
+    </div>
+
+    <!-- Input Section -->
+    <footer class="input-section">
+      <div class="input-box">
+        <textarea
+          id="chat-input"
+          class="chat-input"
+          rows="1"
+          maxlength="4096"
+          placeholder="Savolingizni kiriting... (Enter — yuborish, Shift+Enter — yangi qator)"
+          aria-label="Savol matni"
+        ></textarea>
+        <div class="input-footer">
+          <div class="input-meta">
+            <span id="char-counter">0 / 4096</span>
+            <span class="hint" data-i18n="hint">Enter — yuborish, Shift+Enter — yangi qator</span>
+            <button id="clear-btn" class="clear-btn" type="button" data-i18n="clear">Tozalash</button>
+          </div>
+          <button id="send-btn" class="send-btn" type="button" disabled aria-label="Yuborish">
+            <span data-i18n="send">Yuborish</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+

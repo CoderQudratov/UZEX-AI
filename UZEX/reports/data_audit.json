@@ -1,0 +1,160 @@
+{
+  "phase": 1,
+  "source_sha256": "88182bf4dad3569eea5fac611e8a16db7a455110fdaa6495650e7d87e09ac258",
+  "source_bytes": 26525867,
+  "acceptance": "PASS",
+  "errors": {},
+  "warnings": {},
+  "files": {
+    "participants.csv": {
+      "rows": 14392,
+      "columns": 6,
+      "empty_values": {}
+    },
+    "brokers.csv": {
+      "rows": 120,
+      "columns": 4,
+      "empty_values": {}
+    },
+    "usd_rates.csv": {
+      "rows": 1765,
+      "columns": 2,
+      "empty_values": {}
+    },
+    "contracts.csv": {
+      "rows": 6616,
+      "columns": 28,
+      "empty_values": {
+        "Марка товара": 4350,
+        "Сорт товара": 4161,
+        "Тип товара": 5024,
+        "Класс товара": 4967,
+        "Размер товара": 6105
+      }
+    },
+    "deals_2022.csv": {
+      "rows": 84299,
+      "columns": 22,
+      "empty_values": {
+        "Дата оплаты": 5732,
+        "Дата поставки": 5732,
+        "Поставлено": 5732
+      }
+    },
+    "deals_2023.csv": {
+      "rows": 93985,
+      "columns": 22,
+      "empty_values": {
+        "Дата оплаты": 6313,
+        "Дата поставки": 6313,
+        "Поставлено": 6313
+      }
+    },
+    "deals_2024.csv": {
+      "rows": 106647,
+      "columns": 22,
+      "empty_values": {
+        "Дата оплаты": 7323,
+        "Дата поставки": 7323,
+        "Поставлено": 7323
+      }
+    },
+    "deals_2025.csv": {
+      "rows": 115763,
+      "columns": 22,
+      "empty_values": {
+        "Дата оплаты": 8085,
+        "Дата поставки": 8085,
+        "Поставлено": 8085
+      }
+    },
+    "deals_2026.csv": {
+      "rows": 99306,
+      "columns": 22,
+      "empty_values": {
+        "Дата оплаты": 12984,
+        "Дата поставки": 18838,
+        "Поставлено": 18838
+      }
+    }
+  },
+  "deal_count": 500000,
+  "deal_date_min": "2022-01-03",
+  "deal_date_max": "2026-10-30",
+  "currencies": {
+    "Узбекский сум": 493410,
+    "Доллар США": 6590
+  },
+  "statuses": {
+    "Исполнен": 431061,
+    "Исполнен(Частично)": 22648,
+    "Аннулирован(Не оплачен)": 33719,
+    "Оплачен": 5854,
+    "Заключен": 3954,
+    "Ждёт оплату": 1714,
+    "Не подписан": 86,
+    "Новый": 964
+  },
+  "units": {
+    "килограмм": 203891,
+    "метр": 3863,
+    "тонна": 261629,
+    "штука": 8707,
+    "куб.метр": 5509,
+    "кв.метр": 3877,
+    "литр": 12524
+  },
+  "decimal_profiles": {
+    "Курс": {
+      "max_integer_digits": 5,
+      "max_scale": 2
+    },
+    "Базисная цена": {
+      "max_integer_digits": 9,
+      "max_scale": 2
+    },
+    "Лот": {
+      "max_integer_digits": 4,
+      "max_scale": 0
+    },
+    "Срок оплаты": {
+      "max_integer_digits": 2,
+      "max_scale": 0
+    },
+    "Срок поставки": {
+      "max_integer_digits": 2,
+      "max_scale": 0
+    },
+    "Сумма сделки": {
+      "max_integer_digits": 11,
+      "max_scale": 2
+    },
+    "Стартовая цена": {
+      "max_integer_digits": 9,
+      "max_scale": 2
+    },
+    "Количество": {
+      "max_integer_digits": 7,
+      "max_scale": 0
+    },
+    "Поставлено": {
+      "max_integer_digits": 7,
+      "max_scale": 0
+    }
+  },
+  "all_status_amounts_by_currency": {
+    "Узбекский сум": "206835219986242.97",
+    "Доллар США": "1137509729.39"
+  },
+  "all_status_amount_uzs_at_trade_date_rate": "220477157554431.7867",
+  "usd_rate_date_min": "2022-01-01",
+  "usd_rate_date_max": "2026-10-31",
+  "audit_seconds": 47.866,
+  "notes": [
+    "Empty delivered lots remain NULL, not zero.",
+    "Region aliases are fixed from observed contract links, 14 bijective pairs.",
+    "Synthetic source per README.",
+    "Totals include every status, including cancelled deals.",
+    "Offline audit timing is not API latency. No Gemini calls performed."
+  ]
+}

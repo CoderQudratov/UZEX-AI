@@ -1,0 +1,437 @@
+{
+  "$defs": {
+    "EntityReference": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "enum": [
+            "seller_inn",
+            "buyer_inn",
+            "seller_broker_code",
+            "buyer_broker_code",
+            "product_name",
+            "tn_ved_code",
+            "region",
+            "status",
+            "contract_status"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field",
+        "text"
+      ],
+      "title": "EntityReference",
+      "type": "object"
+    },
+    "Filter": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "enum": [
+            "deal_id",
+            "contract_id",
+            "deal_date",
+            "payment_date",
+            "delivery_date",
+            "deal_time",
+            "seller_inn",
+            "buyer_inn",
+            "seller_name",
+            "buyer_name",
+            "seller_broker_code",
+            "buyer_broker_code",
+            "seller_broker_name",
+            "buyer_broker_name",
+            "product_name",
+            "product_description",
+            "tn_ved_code",
+            "product_group",
+            "product_category",
+            "industry",
+            "brand",
+            "grade",
+            "size",
+            "product_type",
+            "product_class",
+            "region",
+            "contract_region",
+            "status",
+            "contract_status",
+            "contract_type",
+            "contract_form",
+            "auction_type",
+            "currency",
+            "unit",
+            "quantity",
+            "lot_size",
+            "amount",
+            "amount_uzs",
+            "starting_price",
+            "delivered_lots",
+            "volume",
+            "delivered_volume",
+            "unit_price_rounded_8",
+            "registered_date",
+            "valid_until",
+            "warehouse_address",
+            "base_price"
+          ],
+          "title": "Field",
+          "type": "string"
+        },
+        "op": {
+          "enum": [
+            "eq",
+            "ne",
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "between",
+            "in",
+            "is_null",
+            "not_null"
+          ],
+          "title": "Op",
+          "type": "string"
+        },
+        "values": {
+          "default": [],
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "format": "time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "maxItems": 50,
+          "title": "Values",
+          "type": "array"
+        }
+      },
+      "required": [
+        "field",
+        "op"
+      ],
+      "title": "Filter",
+      "type": "object"
+    },
+    "Lookup": {
+      "additionalProperties": false,
+      "properties": {
+        "entity": {
+          "enum": [
+            "transaction",
+            "contract",
+            "company",
+            "broker"
+          ],
+          "title": "Entity",
+          "type": "string"
+        },
+        "identifier": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ],
+          "title": "Identifier"
+        }
+      },
+      "required": [
+        "entity",
+        "identifier"
+      ],
+      "title": "Lookup",
+      "type": "object"
+    },
+    "Order": {
+      "additionalProperties": false,
+      "properties": {
+        "field": {
+          "maxLength": 40,
+          "minLength": 1,
+          "title": "Field",
+          "type": "string"
+        },
+        "direction": {
+          "default": "desc",
+          "enum": [
+            "asc",
+            "desc"
+          ],
+          "title": "Direction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "field"
+      ],
+      "title": "Order",
+      "type": "object"
+    },
+    "Period": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "Period",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "lookup",
+        "records",
+        "aggregate",
+        "compare"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "language": {
+      "default": "uz-Latn",
+      "enum": [
+        "uz-Latn",
+        "uz-Cyrl",
+        "ru"
+      ],
+      "title": "Language",
+      "type": "string"
+    },
+    "lookup": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Lookup"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "filters": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Filter"
+      },
+      "maxItems": 16,
+      "title": "Filters",
+      "type": "array"
+    },
+    "entities": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/EntityReference"
+      },
+      "maxItems": 4,
+      "title": "Entities",
+      "type": "array"
+    },
+    "metrics": {
+      "default": [],
+      "items": {
+        "enum": [
+          "count",
+          "delivered_count",
+          "sum_amount",
+          "avg_amount",
+          "min_amount",
+          "max_amount",
+          "sum_volume",
+          "sum_delivered_volume",
+          "sum_lots",
+          "sum_delivered_lots",
+          "weighted_unit_price",
+          "min_unit_price",
+          "max_unit_price",
+          "price_average"
+        ],
+        "type": "string"
+      },
+      "maxItems": 8,
+      "title": "Metrics",
+      "type": "array"
+    },
+    "group_by": {
+      "default": [],
+      "items": {
+        "enum": [
+          "seller_inn",
+          "buyer_inn",
+          "seller_name",
+          "buyer_name",
+          "seller_broker_code",
+          "buyer_broker_code",
+          "seller_broker_name",
+          "buyer_broker_name",
+          "product_name",
+          "tn_ved_code",
+          "product_group",
+          "product_category",
+          "region",
+          "contract_region",
+          "status",
+          "contract_type",
+          "contract_form",
+          "auction_type",
+          "currency",
+          "unit",
+          "month"
+        ],
+        "type": "string"
+      },
+      "maxItems": 3,
+      "title": "Group By",
+      "type": "array"
+    },
+    "fields": {
+      "default": [],
+      "items": {
+        "enum": [
+          "deal_id",
+          "contract_id",
+          "deal_date",
+          "payment_date",
+          "delivery_date",
+          "deal_time",
+          "seller_inn",
+          "buyer_inn",
+          "seller_name",
+          "buyer_name",
+          "seller_broker_code",
+          "buyer_broker_code",
+          "seller_broker_name",
+          "buyer_broker_name",
+          "product_name",
+          "product_description",
+          "tn_ved_code",
+          "product_group",
+          "product_category",
+          "industry",
+          "brand",
+          "grade",
+          "size",
+          "product_type",
+          "product_class",
+          "region",
+          "contract_region",
+          "status",
+          "contract_status",
+          "contract_type",
+          "contract_form",
+          "auction_type",
+          "currency",
+          "unit",
+          "quantity",
+          "lot_size",
+          "amount",
+          "amount_uzs",
+          "starting_price",
+          "delivered_lots",
+          "volume",
+          "delivered_volume",
+          "unit_price_rounded_8",
+          "registered_date",
+          "valid_until",
+          "warehouse_address",
+          "base_price"
+        ],
+        "type": "string"
+      },
+      "maxItems": 30,
+      "title": "Fields",
+      "type": "array"
+    },
+    "order_by": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Order"
+      },
+      "maxItems": 2,
+      "title": "Order By",
+      "type": "array"
+    },
+    "money_mode": {
+      "anyOf": [
+        {
+          "enum": [
+            "original",
+            "uzs"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Money Mode"
+    },
+    "periods": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Period"
+      },
+      "maxItems": 2,
+      "title": "Periods",
+      "type": "array"
+    },
+    "limit": {
+      "default": 20,
+      "maximum": 100,
+      "minimum": 1,
+      "title": "Limit",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "kind"
+  ],
+  "title": "QueryPlan",
+  "type": "object"
+}

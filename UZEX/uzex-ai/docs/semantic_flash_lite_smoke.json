@@ -1,0 +1,45 @@
+{
+  "mode": "LIVE_GEMINI",
+  "model": "gemini-3.5-flash-lite",
+  "samples": 8,
+  "correct_semantic_cases": 5,
+  "overall_router_accuracy": 0.625,
+  "model_cases": 8,
+  "model_correct_cases": 5,
+  "model_operational_accuracy": 0.625,
+  "model_completed_cases": 5,
+  "model_semantic_accuracy": 1.0,
+  "unsupported_language_cases": 0,
+  "unsupported_language_rejected": 0,
+  "unsupported_language_rejection_rate": null,
+  "json_validation_failures": 0,
+  "guard_rejections": 0,
+  "model_calls": 11,
+  "model_latency": {
+    "n": 5,
+    "p50_ms": 2566.688,
+    "p95_ms": 8975.003
+  },
+  "model_attempt_latency": {
+    "n": 7,
+    "p50_ms": 6464.711,
+    "p95_ms": 20001.815
+  },
+  "end_to_end_latency": {
+    "n": 8,
+    "p50_ms": 5019.456,
+    "p95_ms": 20027.94
+  },
+  "startup_model_metadata_ms": 1471.761,
+  "failure_categories": {
+    "MODEL_TIMEOUT": 2,
+    "MODEL_API_ERROR": 1
+  },
+  "fixture_failure_indexes": [
+    3,
+    6,
+    7
+  ],
+  "acceptance": "INCOMPLETE_OR_FAIL",
+  "privacy": "Aggregate QA metrics only; no utterances, query plans, parameters or answers stored"
+}

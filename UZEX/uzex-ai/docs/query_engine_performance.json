@@ -1,0 +1,39 @@
+{
+  "benchmark": "Phase 3 deterministic QueryPlan to VerifiedResult",
+  "initialization_ms": 257.735,
+  "results": {
+    "exact_lookup": {
+      "samples": 30,
+      "p50_ms": 22.566,
+      "p95_ms": 23.893,
+      "min_ms": 20.523,
+      "max_ms": 23.988
+    },
+    "aggregation": {
+      "samples": 30,
+      "p50_ms": 59.331,
+      "p95_ms": 61.927,
+      "min_ms": 58.502,
+      "max_ms": 62.101
+    },
+    "ranking": {
+      "samples": 30,
+      "p50_ms": 73.603,
+      "p95_ms": 75.741,
+      "min_ms": 71.346,
+      "max_ms": 77.124
+    },
+    "multi_table_join": {
+      "samples": 30,
+      "p50_ms": 43.266,
+      "p95_ms": 46.34,
+      "min_ms": 42.088,
+      "max_ms": 46.374
+    }
+  },
+  "method": "3 warm-ups then 30 sequential samples per operation; p50 median; p95 nearest rank",
+  "scope": "Includes validation, artifact stat guard, semantic probes, compilation, read-only lease, exact arithmetic, sorting and result validation",
+  "limits": "128MB DuckDB engine memory, 1 thread, 5-second lease, no spill, 100 output rows, 20000 groups",
+  "limitations": "Local warm OS cache; single process; not Render, HTTP or Gemini latency",
+  "privacy": "Only aggregate timings are recorded. No queries, parameters, plans, entities or answers are persisted."
+}

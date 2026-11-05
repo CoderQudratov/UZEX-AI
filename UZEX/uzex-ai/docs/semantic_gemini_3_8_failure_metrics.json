@@ -1,0 +1,45 @@
+{
+  "mode": "LIVE_GEMINI",
+  "model": "gemini-3.8-flash",
+  "samples": 8,
+  "correct_semantic_cases": 0,
+  "overall_router_accuracy": 0.0,
+  "model_cases": 8,
+  "model_correct_cases": 0,
+  "model_semantic_accuracy": 0.0,
+  "unsupported_language_cases": 0,
+  "unsupported_language_rejected": 0,
+  "unsupported_language_rejection_rate": null,
+  "json_validation_failures": 0,
+  "guard_rejections": 0,
+  "model_calls": 15,
+  "model_latency": {
+    "n": 7,
+    "p50_ms": 20002.322,
+    "p95_ms": 20020.514
+  },
+  "end_to_end_latency": {
+    "n": 8,
+    "p50_ms": 20010.308,
+    "p95_ms": 20031.965
+  },
+  "startup_model_metadata_ms": 1037.006,
+  "failure_categories": {
+    "MODEL_TIMEOUT": 7,
+    "MODEL_API_ERROR": 1
+  },
+  "fixture_failure_indexes": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "acceptance": "INCOMPLETE_OR_FAIL",
+  "privacy": "Aggregate QA metrics only; no utterances, query plans, parameters or answers stored",
+  "metric_definition": "Original all-attempt score includes provider errors; no completed semantic responses",
+  "completed_semantic_accuracy": null
+}

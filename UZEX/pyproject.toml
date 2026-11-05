@@ -1,0 +1,13 @@
+[project]
+name = "uzex-ai"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+description = "UZEX dataset audit and subsequent evidence-grounded bilingual agent"
+
+[project.optional-dependencies]
+test = ["pytest>=8,<9"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-ra"

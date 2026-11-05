@@ -1,0 +1,54 @@
+{
+  "mode": "LIVE_GEMINI",
+  "model": "gemini-3.5-flash-lite",
+  "samples": 26,
+  "planned_samples": 26,
+  "correct_semantic_cases": 21,
+  "overall_router_accuracy": 0.8076923076923077,
+  "model_cases": 26,
+  "model_correct_cases": 21,
+  "model_operational_accuracy": 0.8076923076923077,
+  "model_completed_cases": 21,
+  "model_semantic_accuracy": 1.0,
+  "unsupported_language_cases": 0,
+  "unsupported_language_rejected": 0,
+  "unsupported_language_rejection_rate": null,
+  "json_validation_failures": 0,
+  "guard_rejections": 0,
+  "model_calls": 35,
+  "model_latency": {
+    "n": 21,
+    "p50_ms": 3621.277,
+    "p95_ms": 16425.262
+  },
+  "model_attempt_latency": {
+    "n": 23,
+    "p50_ms": 3819.274,
+    "p95_ms": 20001.37
+  },
+  "end_to_end_latency": {
+    "n": 26,
+    "p50_ms": 4320.073,
+    "p95_ms": 20010.013
+  },
+  "startup_model_metadata_ms": 648.499,
+  "failure_categories": {
+    "MODEL_TIMEOUT": 2,
+    "MODEL_API_ERROR": 3
+  },
+  "failure_plan_fields": {},
+  "false_verified_cases": 0,
+  "provider_status_counts": {
+    "503": 12,
+    "504": 1
+  },
+  "fixture_failure_indexes": [
+    39,
+    44,
+    50,
+    51,
+    59
+  ],
+  "acceptance": "INCOMPLETE_OR_FAIL",
+  "privacy": "Aggregate QA metrics only; no utterances, query plans, parameters or answers stored"
+}

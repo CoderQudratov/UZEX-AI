@@ -1,0 +1,32 @@
+{
+  "benchmark": "Phase 2 fixed warehouse integrity reads",
+  "environment": "Local Python 3.12; 128MB DuckDB memory cap, 1 thread, no spill",
+  "method": "3 warm-ups + 30 sequential samples per operation, fresh read-only connection per sample",
+  "p95_method": "nearest rank; p50 is median",
+  "results": {
+    "row_count": {
+      "samples": 30,
+      "p50_ms": 10.985,
+      "p95_ms": 12.461,
+      "min_ms": 9.934,
+      "max_ms": 13.164
+    },
+    "primary_key_lookup": {
+      "samples": 30,
+      "p50_ms": 12.132,
+      "p95_ms": 13.776,
+      "min_ms": 10.999,
+      "max_ms": 13.911
+    },
+    "currency_reconciliation": {
+      "samples": 30,
+      "p50_ms": 82.495,
+      "p95_ms": 85.672,
+      "min_ms": 80.343,
+      "max_ms": 88.829
+    }
+  },
+  "limitations": "OS filesystem cache warm; includes lease/open/close. Not Render, concurrency, API or Gemini latency.",
+  "extra_indexes_added": 0,
+  "materialized_summaries_added": 0
+}

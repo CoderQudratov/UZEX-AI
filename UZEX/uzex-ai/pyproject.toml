@@ -19,6 +19,7 @@ dependencies = [
   "uvicorn>=0.35,<1",
   "httpx>=0.28,<1",
   "rapidfuzz>=3.14,<4",
+  "groq>=0.37,<1",
 ]
 
 [dependency-groups]

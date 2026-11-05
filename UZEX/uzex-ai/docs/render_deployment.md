@@ -15,8 +15,12 @@ GitHub ombori: `CoderQudratov/UZEX-AI`. Bitta Web Service yarating:
 - Health Check Path: `/health`.
 - `APP_ENV=production`.
 - `DATABASE_PATH=data/processed/uzex.duckdb`.
-- `GEMINI_MODEL`: real API bilan tekshirilgan model identifikatori.
-- `GEMINI_API_KEY`: faqat Render maxfiy Environment maydoniga kiriting.
+- `LLM_PROVIDER=gemini` yoki foydalanuvchi tanlagan `groq`.
+- Gemini tanlansa: `GEMINI_MODEL` va maxfiy `GEMINI_API_KEY`.
+- Groq tanlansa: `GROQ_MODEL=openai/gpt-oss-120b` (yoki tekshirilgan
+  `openai/gpt-oss-20b`) va maxfiy `GROQ_API_KEY`.
+- Kalitni faqat Render Environment maydoniga kiriting; provayder avtomatik
+  almashtirilmaydi. Tanlangan modelga haqiqiy API so‘rovi bilan tekshiruv zarur.
 - `MAX_CONCURRENT_QUERIES=4`.
 - `GEMINI_TIMEOUT_SECONDS=20`.
 
@@ -57,8 +61,10 @@ o‘zbek kirill va rus tilidagi haqiqiy Gemini savollarini SQL oracle bilan
 solishtiring. Vercel sahifasi ham shu backendga murojaat qilishini tekshiring.
 Kalit, savol, javob, prompt yoki SQL parametrlarini logga yozmang.
 
-Savol va tegishli cheklangan sxema/nomzodlar Gemini APIga inference uchun
-uzatiladi. Provayderning zero-retention kafolati bor deb da’vo qilinmaydi.
+Savol va tegishli cheklangan sxema/nomzodlar tanlangan Gemini yoki Groq APIga
+inference uchun uzatiladi. Provayderning zero-retention kafolati bor deb
+da’vo qilinmaydi. Provayder modelidan faqat QueryPlan olinadi; javob faktlari
+read-only DuckDBdan keladi va lokal qattiq validatorlar saqlanadi.
 
 Tashqi monitoring: `GET https://HAQIQIY-XIZMAT.onrender.com/health`, har 5 daqiqa.
 Bu endpoint har so‘rovda DB yoki Gemini chaqirmaydi va chat ma’lumotini saqlamaydi.

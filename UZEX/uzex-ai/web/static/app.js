@@ -23,9 +23,9 @@
       status_ready: "Baza faol (500k bitim)",
       status_loading: "Ulanmoqda...",
       status_offline: "Xizmat tayyor emas",
-      disclaimer: "Javoblar faqat tasdiqlangan UZEX spot bitimlari datasetiga asoslanadi. Chat tarixi saqlanmaydi.",
+      disclaimer: "Javoblar taqdim etilgan datasetdan olinadi. Savol tanlangan Gemini yoki Groq APIga yuboriladi. Ilova chat tarixini saqlamaydi; provayderda saqlanmasligi kafolatlanmaydi.",
       welcome_title: "UZEX AI birja tahlil tizimiga xush kelibsiz",
-      welcome_desc: "Savdo bitimlari, shartnomalar, sotuvchi/xaridor kompaniyalar va tovarlar bo‘yicha rasmiy ma’lumotlarni oling.",
+      welcome_desc: "Savdo bitimlari, shartnomalar, sotuvchi/xaridor kompaniyalar va tovarlar bo‘yicha taqdim etilgan dataset ma’lumotlarini oling.",
       examples_title: "Namuna savollar:",
       placeholder: "Savolingizni kiriting... (Enter — yuborish, Shift+Enter — yangi qator)",
       send: "Yuborish",
@@ -49,9 +49,9 @@
       status_ready: "База фаол (500к битим)",
       status_loading: "Уланмоқда...",
       status_offline: "Хизмат тайёр эмас",
-      disclaimer: "Жавоблар фақат тасдиқланган UZEX спот битимлари датасетига асосланади. Чат тарихи сақланмайди.",
+      disclaimer: "Жавоблар тақдим этилган датасетдан олинади. Савол танланган Gemini ёки Groq APIга юборилади. Илова чат тарихини сақламайди; провайдерда сақланмаслиги кафолатланмайди.",
       welcome_title: "UZEX AI биржа таҳлил тизимига хуш келибсиз",
-      welcome_desc: "Савдо битимлари, шартномалар, сотувчи/харидор компаниялар ва товарлар бўйича расмий маълумотларни олинг.",
+      welcome_desc: "Савдо битимлари, шартномалар, сотувчи/харидор компаниялар ва товарлар бўйича тақдим этилган датасет маълумотларини олинг.",
       examples_title: "Намуна саволлар:",
       placeholder: "Саволингизни киритинг... (Enter — юбориш, Shift+Enter — янги қатор)",
       send: "Юбориш",
@@ -75,9 +75,9 @@
       status_ready: "База активна (500k сделок)",
       status_loading: "Подключение...",
       status_offline: "Служба не готова",
-      disclaimer: "Ответы основаны исключительно на проверенном датасете спотовых торгов UZEX. История чата не сохраняется.",
+      disclaimer: "Ответы берутся из предоставленного датасета. Вопрос отправляется выбранному API Gemini или Groq. Приложение не хранит историю; отсутствие хранения у провайдера не гарантируется.",
       welcome_title: "Добро пожаловать в аналитическую систему UZEX AI",
-      welcome_desc: "Получайте официальные проверенные данные по биржевым сделкам, контрактам, участникам и товарам.",
+      welcome_desc: "Получайте данные предоставленного датасета по биржевым сделкам, контрактам, участникам и товарам.",
       examples_title: "Примеры запросов:",
       placeholder: "Введите ваш запрос... (Enter — отправить, Shift+Enter — новая строка)",
       send: "Отправить",
@@ -143,14 +143,17 @@
         const data = await res.json();
         if (data.status === "ready" && data.warehouse_ready) {
           statusBadge.classList.add("online");
+          statusText.setAttribute("data-i18n", "status_ready");
           statusText.textContent = UI_TEXT[state.lang].status_ready;
           return;
         }
       }
       statusBadge.classList.remove("online");
+      statusText.setAttribute("data-i18n", "status_offline");
       statusText.textContent = UI_TEXT[state.lang].status_offline;
     } catch {
       statusBadge.classList.remove("online");
+      statusText.setAttribute("data-i18n", "status_offline");
       statusText.textContent = UI_TEXT[state.lang].status_offline;
     }
   }

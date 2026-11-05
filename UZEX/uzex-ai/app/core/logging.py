@@ -31,6 +31,7 @@ class DiagnosticFilter(logging.Filter):
             "language_detector",
             "prompt_builder",
             "gemini_client",
+            "groq_client",
             "json_validation",
             "semantic_guard",
             "query_execution",

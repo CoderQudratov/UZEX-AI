@@ -63,10 +63,21 @@ def _init_components(
         try:
             engine = QueryExecutor(settings)
             planner = None
-            if settings.gemini_api_key and settings.gemini_model:
+            key = (
+                settings.groq_api_key
+                if settings.llm_provider == "groq"
+                else settings.gemini_api_key
+            )
+            if key and settings.llm_model:
                 try:
-                    planner = GeminiPlanner(settings)
+                    if settings.llm_provider == "groq":
+                        from app.agent.groq_client import GroqPlanner
+
+                        planner = GroqPlanner(settings)
+                    else:
+                        planner = GeminiPlanner(settings)
                 except Exception:
+                    logger.error("startup_failed")
                     planner = None
             app_router = SemanticRouter(
                 engine, planner, max_concurrency=settings.max_concurrent_queries
@@ -76,6 +87,7 @@ def _init_components(
                 app_router, max_concurrency=settings.max_concurrent_queries
             )
         except Exception:
+            logger.error("startup_failed")
             app.state.engine = None
             app.state.chat_service = None
 
@@ -183,6 +195,8 @@ def create_app(
             "app_env": app_settings.app_env if app_settings else "unknown",
             "dataset_version": engine.source.version if engine else "unavailable",
             "gemini_model": app_settings.gemini_model if app_settings else None,
+            "llm_provider": app_settings.llm_provider if app_settings else None,
+            "llm_model": app_settings.llm_model if app_settings else None,
             "warehouse_ready": engine is not None,
         }
 

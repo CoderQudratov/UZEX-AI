@@ -3,6 +3,9 @@ import pytest
 NAMES = (
     "GEMINI_API_KEY",
     "GEMINI_MODEL",
+    "LLM_PROVIDER",
+    "GROQ_API_KEY",
+    "GROQ_MODEL",
     "DATABASE_PATH",
     "APP_ENV",
     "MAX_CONCURRENT_QUERIES",

@@ -12,7 +12,7 @@ from pydantic import ValidationError
 
 from app.agent.answer_formatter import format_answer
 from app.agent.gemini_client import PlannerFailure
-from app.agent.language_detector import conservative_normalize, detect_language
+from app.agent.language_detector import conservative_normalize, detect_language, outside_names
 from app.agent.prompt_builder import PromptBuilder
 from app.agent.query_models import Lookup, QueryPlan
 from app.agent.semantic_guard import GuardRejected, check_decision, signals
@@ -33,6 +33,16 @@ class SemanticMetrics:
 
 
 CLARIFY = {
+    "IDENTIFIER_CONTEXT": (
+        "Bu yil, bitim raqami yoki boshqa identifikatormi? Qaysi ma’lumot kerakligini yozing.",
+        "Бу йил, битим рақами ёки бошқа идентификаторми? Қайси маълумот кераклигини ёзинг.",
+        "Это год, номер сделки или другой идентификатор? Уточните, какие данные нужны.",
+    ),
+    "OUT_OF_SCOPE": (
+        "Buni bilmayman: faqat berilgan UZEX bitimlar bazasi bo‘yicha javob bera olaman.",
+        "Буни билмайман: фақат берилган UZEX битимлар базаси бўйича жавоб бера оламан.",
+        "Я не могу ответить: доступны только данные предоставленной базы сделок UZEX.",
+    ),
     "ENTITY_AMBIGUOUS": (
         (
             "Qaysi kompaniya yoki mahsulotni nazarda tutyapsiz? Aniq nomi yoki STIRni "
@@ -160,6 +170,13 @@ def notice(language, status, reason):
         )
     index = {"uz_latn": 0, "uz_cyrl": 1, "ru": 2}.get(language, 0)
     reason = {
+        "LLM_TIMEOUT": "GEMINI_TIMEOUT",
+        "LLM_UNAVAILABLE": "GEMINI_UNAVAILABLE",
+        "LLM_QUOTA_EXHAUSTED": "GEMINI_QUOTA_EXHAUSTED",
+        "LLM_AUTHENTICATION": "GEMINI_CONFIGURATION",
+        "LLM_MODEL_NOT_FOUND": "GEMINI_CONFIGURATION",
+        "LLM_NOT_CONFIGURED": "GEMINI_CONFIGURATION",
+        "LLM_INVALID_REQUEST": "MODEL_JSON_INVALID",
         "MODEL_TIMEOUT": "GEMINI_TIMEOUT",
         "MODEL_UNAVAILABLE": "GEMINI_UNAVAILABLE",
         "MODEL_TRANSPORT_ERROR": "GEMINI_UNAVAILABLE",
@@ -171,6 +188,45 @@ def notice(language, status, reason):
     if reason in INFRASTRUCTURE:
         return GENERIC["ERROR"][index] + " " + INFRASTRUCTURE[reason][index]
     return CLARIFY.get(reason, GENERIC.get(status, GENERIC["AMBIGUOUS"]))[index]
+
+
+def clearly_out_of_scope(question):
+    """Reject explicit non-dataset tasks; nouns inside recorded names are not tasks."""
+    plain = outside_names(question).casefold()
+    coding_noun = re.search(
+        r"\b(?:python|javascript|java|html|css|sql|kod|kodni|код|кода|dastur|дастур)\b",
+        plain,
+    )
+    coding_task = re.search(
+        r"\b(?:yoz(?:ib|ing)?|yozber|tuz(?:ib|ing)?|yarat(?:ib|ing)?|"
+        r"ёз(?:иб|инг)?|туз(?:иб|инг)?|ярат(?:иб|инг)?|"
+        r"напиши|напишите|написать|создай|создайте|исправь|write|generate)\b",
+        plain,
+    )
+    if coding_noun and coding_task:
+        return True
+    if re.fullmatch(r"\s*\d+(?:\s*[+*/−–-]\s*\d+)+(?:\s*=\s*\??)?\s*[?!.]?\s*", plain):
+        return True
+    dataset_task = re.search(
+        r"\b(?:bitim\w*|битим\w*|sdel\w*|сдел\w*|shartnoma\w*|шартнома\w*|"
+        r"контракт\w*|договор\w*|stir|стир|инн|broker\w*|брокер\w*|"
+        r"mahsulot\w*|маҳсулот\w*|продукт\w*|tovar\w*|товар\w*|"
+        r"kompaniya\w*|компания\w*|firm\w*|фирм\w*)\b",
+        plain,
+    )
+    if dataset_task:
+        return False
+    return bool(
+        re.search(
+            r"\bob[ -]?havo\b|\bоб[ -]?ҳаво\b|\bпогод\w*\b|"
+            r"\b(?:davola\w*|tashxis\w*|давола\w*|ташхис\w*|лечить|лечение|диагноз\w*)\b|"
+            r"\b(?:dori|дори)\s+(?:tavsiya|тавсия)\b|"
+            r"\b(?:latifa|латифа)\s+(?:ayt|айт)\b|"
+            r"\b(?:расскажи|расскажите)\s+анекдот\b|"
+            r"\b(?:poytaxt\w*|пойтахт\w*|столица\w*)\b",
+            plain,
+        )
+    )
 
 
 def exact_lookup(question, language):
@@ -254,7 +310,18 @@ class SemanticRouter:
         if hint.disposition == "unsupported":
             self.metrics.language_rejections += 1
             return output("UNSUPPORTED", "UNSUPPORTED_LANGUAGE")
+        if clearly_out_of_scope(question):
+            # A numeric expression has no language; the default UI language is Uzbek Latin.
+            language = hint.language or (
+                "uz_cyrl"
+                if re.search("[ўқғҳ]", question)
+                else "ru"
+                if re.search("[а-яё]", question, re.I)
+                else "uz_latn"
+            )
+            return output("UNSUPPORTED", "OUT_OF_SCOPE")
         if hint.disposition == "ambiguous":
+            language = "uz_latn"
             return output("AMBIGUOUS", "IDENTIFIER_CONTEXT")
         canonical = conservative_normalize(question)
         intent = signals(question)
@@ -292,7 +359,10 @@ class SemanticRouter:
                 self.prompts.build, question, hint, reference
             )
             diagnostic(stage, None, "SUCCESS", stage_start, request_id)
-            stage, stage_start = "gemini_client", time.perf_counter()
+            stage = (
+                "groq_client" if type(self.planner).__name__ == "GroqPlanner" else "gemini_client"
+            )
+            stage_start = time.perf_counter()
             raw, calls, model_ms = await self.planner.generate(system, contents)
             diagnostic(stage, None, "SUCCESS", stage_start, request_id)
             self.metrics.model_calls += calls

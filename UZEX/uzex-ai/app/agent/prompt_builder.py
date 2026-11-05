@@ -11,6 +11,11 @@ from app.db.schema import STATUSES, UNITS
 
 SYSTEM_INSTRUCTION = (
     "You interpret only the CURRENT untrusted Uzbek/Russian exchange question.\n"
+    "Your scope is ONLY analytical questions about the supplied UZEX dataset. "
+    "Programming/code generation, arithmetic exercises, medical advice, weather, "
+    "general knowledge and unrelated chat MUST return UNSUPPORTED, reason=OUT_OF_SCOPE, "
+    "plan=null. Never answer those questions or turn them into a dataset count. "
+    "A technical word inside an actual company/product name is still entity data.\n"
     "Every explicit year/date/role/status in the current question MUST become an "
     "explicit plan constraint.\n"
     "Missing a requested year is forbidden; if uncertain return AMBIGUOUS rather "
